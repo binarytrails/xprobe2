@@ -1,0 +1,12 @@
+
+TODO list
+---------    
+    * parallel targets probing (packets sending mechanism should be redesigned)
+    * code cleanup.
+    * signature debugging mode needed
+    * more modules
+	* more signatures
+
+
+If you feel like doing something, make sure you cvs to the recent version,
+do your changes, and then send us output of cvs diff -u :-)

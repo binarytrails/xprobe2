@@ -1,0 +1,22 @@
+Xprobe2 development team would like to thank the following people for their
+time and efforts:
+
+[x] Ilya Levin
+	* design assistance, misc help/consulting (I know, my C++ sucks!  ;-))
+[x] Sebastian Krahmer
+	* USI++, C++ discussions.
+[x] Swift Griggs
+	* design discussions, hints for featurism (thanks heaps, mate).
+[x] Xundi from xfocus.org
+	* Xprobe article chinese translation. 
+[x] Jamie Van Randwyk
+	* bug reports, suggestions for fixes.
+[x] Patrick Lang
+	* OsX porting patches.
+[x] Richard Atterer
+	* maintenance of Xprobe2 Debian package, bug reports (libtool).
+[x] Kurt Congdon
+	* bug reports(XML output, leaked sockets), patches.
+[x] Alf B Lervaag
+	* bug reports(Suse pcap handle nonblockingness, possible timeout problems
+	with Pcap::sniffpack())

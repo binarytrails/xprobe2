@@ -1,0 +1,117 @@
+1.93
+----
+
+    * bugfix in TCP: now the correct length of received segment is
+      returned when processed TCP-options -- TCP options doesnt
+      count as data and therefore TCP::sniffpack() returns only
+      lenght of data contained, not including TCP headder or options
+    * bugfix: in_cksum() now correctly distinguishs between IP,ICMP and
+      UDP,TCP checksums (TCP+UDP may be padded in odd case, ICMP not)
+
+
+1.92
+----
+
+    * Added timeout() functions
+
+    * Added broadcast capability
+
+    * Added experminetal get_{tcp,ip,udp}hdr
+
+    * Added INADDR_ANY as src-IP when gethostname() fails
+      this is OK for IP and ICMP packets but breaks with UDP/TCP
+      b/c of its chksum calculated over pseudo-hdr because src-IP is
+      involved.
+
+    * Added	Pcap::pcap() for more flexibility
+
+    * Began to change naming policy for internal data. Does not affect
+      exported symbols.
+
+1.90
+----
+   
+    * introduced Layer2/RX/TX concept
+    
+1.68
+----
+    * small fixes for UDP checksum
+    
+1.67 Alpha
+----------
+
+    * NetBSD compilationtests
+    * Added sending Datalink for Linux
+    * ARP-spoofing possible now
+    * copy-constructor for Datalink, IP, ICMP, UDP and TCP
+    * removed pcap-headers
+    * all methods which requiere a length-field, have this filed
+      of type size_t
+    * migration to CVS
+    
+1.66
+----
+
+    * Big Endian TCP-options bugfix
+    * changed set_totlen() behaivior. It's not yet possible to
+      modify totlen field in IP-header
+    * Much stronger TCP-options code now
+    
+1.65
+----
+
+    * IP/TCP-options bugfix
+
+1.64
+----
+
+    * OpenBSD port
+    * added TCP-options: EOL, NOP, timestamp, mss and wscale (alpha!)
+    * internal cleanups
+    * set_hlen() and get_hlen from IP-class now set/return the number
+      of 32-Bit words. So when you earlier did ip->get_hlen() and got 20
+      you will now get 5.
+    * separated the classes 
+    * put all classes into namespace usipp.
+    
+    
+1.63
+----
+
+    * ARP-class bugfix
+    * Datalink {} now can be used to sniff on the datalink directly.
+      (you are able to set a filter in the constructor now)
+    * Bugfix for hostbyteordered tot_len and frag_off for BSD.
+    * added USI_VERSION #define so you can obtain version
+      of libUSI++
+
+1.62 
+----
+
+    * WoW! Defragmentation is done now!
+    * lots of internal cleanups
+    * hwaddr-fix
+
+
+1.60
+----
+
+    * new class Datalink {} added
+    * icmpId - bugfix
+    * set/getMAC functions added (experimental!)
+    * ARP class added
+    * libusi++ is faster now
+    * fixed some memory-leaks
+    * new syntax for IP::get_src/IP::get_dst
+    * full PPP-support
+
+
+1.50
+----
+
+    * added PPP-handling (works fine with 2 connected PC's via nullmodemcable,
+      indeed it has datalink of DLT_RAW :-)
+    * tcp_sniff is now able to record logins that come from X-terminals
+    * much better HTML-docu
+    * better/more flexible error-handling
+

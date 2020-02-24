@@ -1,0 +1,83 @@
+
+# $Id: Makefile.in,v 1.4 2003/04/22 19:59:54 fygrave Exp $
+#
+# Copyright (C) 2001 Fyodor Yarochkin <fygrave@tigerteam.net>,
+#                    Ofir Arkin       <ofir@sys-security.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+FILES=AUTHORS Makefile.in README acconfig.h cfg-scripts configure \
+configure.in docs
+SOURCES=@SOURCES@
+HEADERS=@HEADERS@
+SRCFILES= Makefile.in config.h.in defines.h.in @SOURCES@ @HEADERS@ \
+xptests
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_DATA=@INSTALL_DATA@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+mandir=@mandir@
+sysconfdir=@sysconfdir@
+CFGDIR=@CFGDIR@
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
+TARDIR=$(PACKAGE)-$(VERSION)
+TARFILE=$(TARDIR).tar
+TGZFILE=$(TARFILE).gz
+SIGFILE=$(TGZFILE).asc
+SIG=md5sum -b
+
+
+all: 
+	cd libs-external/USI++/src; ${MAKE}
+	cd src; ${MAKE}
+
+
+clean:
+	cd libs-external/USI++/src; ${MAKE} clean
+	cd src; ${MAKE} clean
+distclean: clean
+	rm -f config.cache config.log config.status Makefile
+	cd libs-external/USI++/src; ${MAKE} distclean
+	cd src; ${MAKE} distclean
+install: src/xprobe2
+	$(INSTALL_PROGRAM) -d $(DESTDIR)/$(bindir)
+	$(INSTALL_PROGRAM) -d $(DESTDIR)/$(mandir)/man1
+	$(INSTALL_PROGRAM) -d $(DESTDIR)/$(sysconfdir)/xprobe2
+	$(INSTALL_PROGRAM) -m 0755 src/xprobe2 $(DESTDIR)/$(bindir)
+	$(INSTALL_PROGRAM) -m 0444 etc/xprobe2.conf $(DESTDIR)/$(sysconfdir)/xprobe2
+	$(INSTALL_DATA) docs/xprobe2.1 $(DESTDIR)/$(mandir)/man1
+
+configure: configure.in
+	autoheader
+	autoconf    
+
+tarball: configure
+	mkdir ../$(TARDIR)
+	mkdir ../$(TARDIR)/src
+	cp -R $(FILES) ../$(TARDIR)/
+	cd src;cp -R $(SRCFILES) ../../$(TARDIR)/src
+	cd ../; tar cfz $(TGZFILE) $(TARDIR)/
+	cd ../;$(SIG) $(TGZFILE) > $(SIGFILE)
+	rm -rf ../$(TARDIR)
+
+arc: configure distclean
+	rm -rf ../$(TARDIR)
+	cp -R ../$(PACKAGE) ../$(TARDIR)
+	cd ..; tar cvfz $(TGZFILE) $(TARDIR)
+	cd ../;$(SIG) $(TGZFILE) > $(SIGFILE)
+	rm -rf ../$(TARDIR)

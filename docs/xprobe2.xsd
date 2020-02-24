@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:annotation>
+  <xs:documentation>
+
+    XML Schema for Xprobe2 XML output.
+    Created using VS.NET's xsd.exe (manually cleaned/corrected/improved).
+
+    History:
+      - meder@areopag.net Jun 10, 2004: created first draft version;
+
+  </xs:documentation>
+</xs:annotation> 
+
+<xs:simpleType name="numberOfPortsType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="0" />
+    <xs:maxInclusive value="65535" />
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="portNumberType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="1" />
+    <xs:maxInclusive value="65535" />
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="percentRangeType">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="1" />
+    <xs:maxInclusive value="100" />
+  </xs:restriction>
+</xs:simpleType>
+
+  <xs:element name="Xprobe2">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="run">
+          <xs:complexType>
+            <xs:attribute name="arguments" type="xs:string" use="required" />
+            <xs:attribute name="date" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="modules">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="module" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="type" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="reachability"/>
+                            <xs:enumeration value="information gathering"/>
+                            <xs:enumeration value="fingerprinting"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                      <xs:attribute name="name" type="xs:string" use="required" />
+                      <xs:attribute name="number" type="xs:positiveInteger" use="required" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="caption" type="xs:string" use="required" fixed="Loaded modules"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="target" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="reachability">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="state">
+                      <xs:complexType>
+                        <xs:attribute name="state" use="required">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="up" />
+                              <xs:enumeration value="down" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="probability" type="percentRangeType" use="required" />
+                        <xs:attribute name="unit" type="xs:string" fixed="percent" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="rtt">
+                      <xs:complexType>
+                        <xs:attribute name="real" type="xs:duration" use="required" />
+                        <xs:attribute name="selected" type="xs:duration" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="information_gathering" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="portscan" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="stats">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="tcp" minOccurs="0" maxOccurs="1">
+                                  <xs:complexType>
+                                    <xs:attribute name="open" type="numberOfPortsType" use="required" />
+                                    <xs:attribute name="closed" type="numberOfPortsType" use="required" />
+                                    <xs:attribute name="filtered" type="numberOfPortsType" use="required" />
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="udp" minOccurs="0" maxOccurs="1">
+                                  <xs:complexType>
+                                    <xs:attribute name="open" type="numberOfPortsType" use="required" />
+                                    <xs:attribute name="closed" type="numberOfPortsType" use="required" />
+                                    <xs:attribute name="filtered" type="numberOfPortsType" use="required" />
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="details">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="port" minOccurs="1" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:attribute name="number" type="portNumberType" use="required" />
+                                    <xs:attribute name="proto" use="required">
+                                      <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                          <xs:pattern value="tcp|udp" />
+                                        </xs:restriction>
+                                      </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="state" use="required">
+                                      <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                          <xs:pattern value="open|closed|filtered" />
+                                        </xs:restriction>
+                                      </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="service" type="xs:string" use="required" />
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="duration" type="xs:duration" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="os_guess">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="primary">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="probability" type="percentRangeType" use="required" />
+                            <xs:attribute name="unit" type="xs:string" fixed="percent" use="required" />
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="secondary" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="probability" type="percentRangeType" use="required" />
+                            <xs:attribute name="unit" type="xs:string" fixed="percent" use="required" />
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="ip" type="xs:string"  use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

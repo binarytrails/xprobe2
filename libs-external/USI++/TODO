@@ -1,0 +1,12 @@
+bugs:
+- close(socket) in ~TX_IP
+- laenmge in IP berechnen (pcap reurned bei packeten <60bytes
+den rest des ether-frames mit, weil minimumlaenge des EII frames 
+ist 64 byte mit crc).
+
+* complete ICMP-class?
+* IP-Options
+* Sparc-linux tests
+* Slowaris port
+* timeout in defrag-routine -> do we need defrag anyway?
+* proper timeout handling in sendpack

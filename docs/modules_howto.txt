@@ -1,0 +1,210 @@
+$Id: modules_howto.txt,v 1.3 2005/06/26 11:23:20 mederchik Exp $
+
+This document describes how to add your own module to xprobe
+
+Xprobe2 Modules Howto
+---------------------
+
+To write a module for xprobe2, do following:
+
+create a class which will inherit Xprobe_module:
+
+#include "xprobe.h"
+#include "xprobe_module.h"
+#include "xprobe_module_hdlr.h"
+#include "target.h"
+#include "interface.h"
+#define _XPROBE_MODULE
+#include "xplib.h"
+
+class Your_Module: public Xprobe_Module {
+    private:
+		void generate_signature(Target *, ICMP *, ICMP *)
+		/* or
+		void generate_signature(Target *, TCP *, TCP *) */
+    public:
+        Test_Mod(void) : Xprobe_Module(XPROBE_MODULE_ALIVETEST, "YOUR_MODULE NAME") { /*your constructor*/ }
+        
+        /* or just 
+        Test_Mod(void) : Xprobe_Module("YOUR_MODULE NAME")  { your constructor } */
+        ~Test_Mod(void) { return; }
+        int init(void);
+        int parse_keyword(int os_id, char *keyword, char *value);
+        int exec(Target *tg, OS_Matrix *os);
+        int fini(void);
+};
+
+
+the first argument in constructor signifies type of function which your
+module is going to perform. "ALIVETESTS" are modules which testify
+remote system reachability. "OSTESTS" - modules which do actual
+fingerprinting.
+
+and create following function:
+
+int your_module_init(Xprobe_Module_Hdlr *pt) {
+
+    int mod_id;
+    Your_Module *mod = new Your_Module;
+
+    xprobe_mdebug(XPROBE_DEBUG_MODULES, "Initializing the YOUR_MODULE module\n");
+    pt->register_module(mod);
+    /* keywords which you will be parsing in parse_keyword routine */
+    pt->add_keyword(mod->get_id(), "keyword1");
+    pt->add_keyword(mod->get_id(), "keyword2");
+    pt->add_keyword(mod->get_id(), "keyword3");
+
+return OK;
+}
+
+Following methods of class you will have to write yourself:
+
+init()
+------
+init() -- prepare all the data, sockets whatever you will need to use.
+
+parse_keywords()
+----------------
+parse_keywords(int os_id, char *keyword, char *value); we will call it if we see
+keywords which you registered for your module, appearing for OS
+fingerprint with id OS_ID. You will suppose to parse the keyword and
+store the result in internal format (whichever you wish to choose) which
+will represent OS-id, your test results according to the keyword, you
+parsed for this OS, and score, which ranks how the given 'fingerprint'
+matches the signature if the test results match. Possible variants for
+the score are:
+XPROBE_MATCH_YES, XPROBE_MATCH_NO, XPROBE_MATCH_PROBABLY_YES, XPROBE_MATCH_PROBABLY_NO
+
+exec()
+------
+exec(Target *tg, OS_Matrix *os)-- you  perform your tests
+against the target here, and then submit us results, how much each OSid,
+which you saw/parsed signature for, matches the target which you examined.
+use follwing function to do that:
+
+OS_Matrix->add_result(this->get_id(), int OS_id,int score);
+
+All the information regarding target system you obtain through a class
+'Target' (see target.h for details), more over the communications with
+the core system you perform through target methods as well. You should
+be able to get all the data you need, if missing something, let me know.
+
+Here are the most useful functions:
+
+tg->get_addr() -- returns in_addr struct of target
+tg->get_interface() -- returns char ptr to interface name
+tg->get_inetface_addr() - returns address of the interface through which
+you connect to the target.
+tg->get_port(IPPROTO_TCP, XPROBE_TARGETP_OPEN) (or CLOSED, or FILTERED)
+-- will give you a port number (or -1 if unknown) which you asked for.
+
+you can also use tg->add_port() to set port status, if you found it
+during the test.
+
+tg->get_distance() and tg->set_distance() will return or set (for use of other
+modules) ttl distance to the target system.
+
+tg->get_ttl(type) - returns ttl for particular type of packet (if
+known). See target.h for pre-defined types (tcp syn+ack, tcp rst, etc)
+
+tg->set_ttl(type, ttl) - sets ttl for particular type of packet.
+
+*Note:
+ for reachability tests modules, OS_id, should always be 1. As we don't
+have signatures to be parsed. parse_keywords() routine should be dummy
+and you don't have to register any particular keywords unless you
+expect parameters from config file.
+
+**Note:
+If your module has keywords that would only have meaning if one of the keywords
+is set to specific value, as in following example:
+
+	icmp_addrmask_reply = n
+	icmp_addrmask_reply_ttl = <255
+	icmp_addrmask_reply_ip_id = !0
+
+'icmp_addrmask_reply_ttl' and 'icmp_addrmask_reply_ip_id' depend on the value of
+'icmp_addrmask_reply'. So if accoring to the fingerprint the should be no reply
+from the target, module has to generate two additional matches using:
+
+OS_Matrix::add_result()
+
+in order for target to get 100% match
+
+fini()
+------
+
+deallocate all the memory which you allocated here. Close all the
+sockets. Clean up everything. Destructor for your module will be called
+right after. You don't have to delete your module object instance
+itself, which you allocated in init function, we will do that for you.
+
+generate_signature()
+--------------------
+
+private method that will generate signature for the given target, in
+your exec() method, you need to check bool Target->generate_sig(), if
+method returns true then you need to generate signature (i.e. call
+generate_signature() method, where using one of following Target
+methods:
+		void signature(string& key, string& val);
+		void signature(const char *, const char *);
+
+you add keyword-value pairs to the Target object).
+
+User Interface
+--------------
+
+Currently only command line/text interface is implemented. However for
+further compatibility we have Interface() class which has particular
+methods to output the data. We insist on using these in your code.
+
+Later other interfaces might be developed (or you could develop these
+yourself) this will save the hassle of porting your module to every new
+interface.
+
+Declare following:
+extern Interface *ui;
+
+use our user interface routines to generate output:
+
+xprobe_debug(XPROBE_DEBUG_MODULES, "fmt string: %s", arg); to print
+debug messages.
+xprobe_mdebug(XPROBE_DEBUG_MODULES, "something"); to print single string
+debug messages.
+
+ui->msg("message: %s", args); to print messages (prefix them with [x] [module])
+ui->log("something"); to log data
+ui->error("...", blah); to report errors..
+ui->perror("something"); use instead of perror();
+ui->verbose(verbosity_level, "msg",..) -- (controlled with -v option,
+1,2,3 .. are possible levels)
+
+
+
+Compilation
+-----------
+
+to include the module into our source you have to do following:
+
+1) add your init function ot xpmodules/static_modules.h like this:
+
+
+...
+typedef int(* xprobe_module_init_t)(Xprobe_Module_Hdlr *);
+
+xprobe_module_init_t mod_init_funcs[]= {
+    test_mod_init, 
+    your_module_init,
+    NULL};
+
+
+2) place your module into:
+    alive_probe directory (create subdirectory if you care, there).
+Create Makefile.in to compile your modules and edit
+xpmodules/Makefile.in to link your objects to modules.a library
+file. You can create your own archive of objects with ar, just don't run
+runlib on it and let us add your achive to ours.
+
+3) test that everything builds properly. Send me complains if it doesn't
+;-)

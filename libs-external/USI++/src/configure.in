@@ -1,0 +1,59 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(ip.cc)
+AC_CONFIG_HEADER(config.h)
+
+AC_CONFIG_AUX_DIR(cfgaux)
+AC_CANONICAL_HOST
+
+
+dnl Checks for programs.
+AC_PROG_CXX
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+
+dnl Checks for libraries.
+AC_CHECK_LIB(pcap, main,,echo Need libpcap installed;exit)
+
+dnl Check for pcap_setnonblock()
+AC_CHECK_LIB(pcap, pcap_setnonblock,AC_DEFINE(HAVE_PCAP_SETNONBLOCK,,pcap_setnonblock func is present),)
+
+dnl check for pcap was successfull
+case "$host" in
+	*linux*)
+		CFLAGS="$CFLAGS -fPIC"
+		;;
+	*free*bsd*)
+		CFLAGS="-DBROKEN_BSD -DIMMEDIATE $CFLAGS"
+		;;
+	*bsd*)
+		CFLAGS="$CFLAGS -DIMMEDIATE -fPIC"
+		;;
+	*darwin*)
+		CFLAGS="$CFLAGS -DDARWIN"
+		;;
+	*)
+		echo "Sorry, $host not supported yet."
+		;;
+esac
+
+
+AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(nsl, inet_ntoa)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h linux/filter.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_C_BIGENDIAN
+
+dnl Checks for library functions.
+AC_OUTPUT(Makefile)
+
+ln -s ../usi++ usi++||true
+rm -f usi++/config.h||true
+cp config.h usi++/config.h
+

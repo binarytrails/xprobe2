@@ -1,0 +1,847 @@
+2005-07-26  mederchik
+
+	* man page updated with example on using SNMP module
+
+2005-07-26  mederchik
+
+	* several sample snmp_sysdescr substrings for freebsd and mac os
+
+2005-07-26  mederchik
+
+	* finished SNMPv2c module, registers keyword "snmp_sysdescr", which
+	should be a substring of a sysDescr.0 string
+
+2005-07-26  mederchik
+
+	* fix for port_is_open() method to correctly test whether given
+	port is open
+
+2005-07-21  mederchik
+
+	* a list of community strings to try is in xprobe2.conf file
+
+2005-07-21  mederchik
+
+	* skeleton for the SNMP module
+
+2005-07-21  mederchik
+
+	* a slight change in logic of the module, now it send NBT node
+	status query before session setup packet
+
+2005-07-18  mederchik
+
+	* base for SNMP module
+
+2005-07-18  mederchik
+
+	* fixed several bugs and added more sanity checks. Also added NBT
+	node status query to get the name remote box listens on (also gets
+	us MAC).
+
+2005-07-18  mederchik
+
+	* added OS_Matrix::add_result(XPROBE_MATCH_NO) calls when no
+	matches are found
+
+2005-07-18  mederchik
+
+	* added OpenUDPSocket routine
+
+2005-07-18  mederchik
+
+	* fixed bug when using Xprobe_Module_Params INTLIST. The bug showed
+	up after we added possibility to have variable number of keywords
+	for fingerprints and resulted in extra OS_Matrix::add_result calls
+
+2005-07-18  mederchik
+
+	* base for SNMP module
+
+2005-07-18  mederchik
+
+	* update from Ofir (keywords for smb module)
+
+2005-06-26  mederchik
+
+	* added support for OS_Matrix to be able to still give 100%
+	whenever different fingerprints have different number of keywords
+
+2005-06-26  mederchik
+
+	* several updates to the modules: -added new checkpoint value for
+	TTL singature generation (60); -added sanity check to the SMB
+	module;
+
+2005-06-26  mederchik
+
+	* minor updates to the man page and howtos
+
+2005-06-23  mederchik
+
+	* new SMB module import. Module extract Native OS and Native Lanman
+	from session setup and X reply. Module supports both SMB over
+	NBT(139) and naked SMB(445). Module will be executed if either 139
+	or 445 TCP port is open
+
+2005-06-23  mederchik
+
+	* util func to compare strings
+
+2005-06-23  mederchik
+
+	* added method to check if specific port is open
+
+2005-06-20  mederchik
+
+	* updated TODO
+
+2005-06-19  mederchik
+
+	* update from Ofir
+
+2005-06-17  mederchik
+
+	* removed debugging printf()
+
+2005-06-17  mederchik
+
+	* CREDITS
+
+2005-06-17  mederchik
+
+	* small fix for compiler warning on osx
+
+2005-06-17  mederchik
+
+	* fixes for bugs reported by Alf B Lervaag <alfborge@stud.ntnu.no>
+
+2005-06-09  mederchik
+
+	* update from Ofir
+
+2005-02-16  mederchik
+
+	* stupid bug in if statment, resulted in 97% match, as border value
+	of echoed_dtsize was equal 64
+
+2005-02-15  mederchik
+
+	* updated CHANGELOG
+
+2005-02-15  mederchik
+
+	* new default port 65534
+
+2005-02-15  mederchik
+
+	* fixed to_string as it displayed the same ip because of
+	inet_ntoa() call
+
+2005-02-15  mederchik
+
+	* upate from Ofir
+
+2005-02-14  mederchik
+
+	* update man page with info on -A and add some checks for proper
+	use of -A
+
+2005-02-14  mederchik
+
+	* experimental suport for detection of transparent proxies,
+	firewalls/NIDSs spoofing RSTs on behalf of target added to
+	portscanner, to enable use -T in conjunction with -A
+
+2005-02-14  mederchik
+
+	* fixed singature generation and matching: echoed_dtsize of
+	icmp_unreach can now have arbitrary number, ip_id_strategy
+	generation in tcp_rst now matches <=256 instead of <256 for I
+
+2005-02-14  mederchik
+
+	* added int_to_string() to xp_lib
+
+2005-02-14  mederchik
+
+	* nicer ouput of packets
+
+2005-02-14  mederchik
+
+	* signature update from Ofir including updated fingerprints for new
+	module
+
+2005-02-13  mederchik
+
+	* employ new usi++ methods
+
+2005-02-13  mederchik
+
+	* usi++ modifications for packet comparison that will be used by
+	portscanner to detect variations in replies from target
+
+2005-02-13  mederchik
+
+	* updated port list for -B in example
+
+2005-02-13  mederchik
+
+	* cosmetic change to be consistent with xprobe2 output
+
+2005-02-13  mederchik
+
+	* fixed bug when configure for USI++ was run two times; added some
+	symbols to configure.in to port to MacOSX
+
+2005-02-09  mederchik
+
+	* automatically generated CHANGELOG
+
+2005-02-09  mederchik
+
+	* fixed ICMP info module disabling issue
+
+2005-02-09  mederchik
+
+	* added new keywords, added some minor optimizations, fixes and
+	minor enhacements
+
+2005-02-09  mederchik
+
+	* added operator=, as default was copying pointers
+
+2005-02-09  mederchik
+
+	* updated from Ofir + added full FreeBSD 5.3 fingerprint with and
+	without rfc 13223 extensions enabled
+
+2005-02-09  mederchik
+
+	* start using CREDITS for credits
+
+2005-02-09  mederchik
+
+	* commited fixes from Kurt Congdon <kurt@vdubgeek.net>
+
+2005-02-09  mederchik
+
+	* New TCP RST module added
+
+2005-01-14  mederchik
+
+	* fix bug reported by Kurt Congdon <kurt@vdubgeek.net>:
+	Target_Net::getnext() returned special addresses (network num and
+	broadcast)
+
+2005-01-12  mederchik
+
+	* signature update from Ofir, forget to remove a var from
+	xp_lib.cc, update copyright to 2005
+
+2005-01-12  mederchik
+
+	* fixed non-zero ACK in SYN packet
+
+2005-01-12  mederchik
+
+	* remove debugging statements
+
+2005-01-12  mederchik
+
+	* new xprobe_module_param type introduced _INTLIST, which handles
+	comma separated list of integers as value
+
+2005-01-12  mederchik
+
+	* regenerated configure script, got rid of Wmissing-prototypes, as
+	it was causing warnings
+
+2005-01-12  mederchik
+
+	* move tokenize to a xp_lib class that from now on will be holding
+	all utility methods/funcs. TODO: move all xp_ funcs there too
+
+2005-01-10  mederchik
+
+	* new configure script for usi
+
+2005-01-10  mederchik
+
+	* port 6000 added to blind guess list
+
+2005-01-10  mederchik
+
+	* got duplicate sigs from somwhere, fixed
+
+2005-01-05  mamezo
+
+	* sigs update
+
+2004-12-27  mederchik
+
+	* Richard Atterer <atterer@debian.org> pointed to old config.guess
+	and config.sub, update to new version
+
+2004-12-27  mederchik
+
+	* get rid of carriage return char
+
+2004-12-20  mederchik
+
+	* update from Ofir
+
+2004-12-17  mederchik
+
+	* fixed emails
+
+2004-12-17  mederchik
+
+	* update from Ofir
+
+2004-12-16  mamezo
+
+	* sync
+
+2004-12-15  mederchik
+
+	* forgot to remove -P from man
+
+2004-12-15  mederchik
+
+	* got rid of -P as it was useless, fixed portscanner not to run if
+	no ports specified
+
+2004-12-15  mederchik
+
+	* update from Ofir
+
+2004-12-15  mederchik
+
+	* updated man
+
+2004-12-12  mederchik
+
+	* algnment fix
+
+2004-12-09  mederchik
+
+	* name feature blind guess
+
+2004-11-29  mederchik
+
+	* -B option added to bruteforce TCP ports in tcp handshake module
+
+2004-11-12  mederchik
+
+	* fix ttl_calc module to associate ICMP packets w/ respective
+	UDP/TCP packets
+
+2004-10-21  mederchik
+
+	* fix to make module recognize its packets more precisely
+
+2004-10-17  mederchik
+
+	* updated
+
+2004-10-17  mederchik
+
+	* fixed timeouts and make pcap_next() nonblocking
+
+2004-10-14  mederchik
+
+	* suspend warning when compiling on linux
+
+2004-10-14  mederchik
+
+	* updated CHANGELOG
+
+2004-10-12  mederchik
+
+	* remove the annoying usi++() set_dst() call from constructor to
+	fix the problem when local hostname does not resolve
+
+2004-09-05  mederchik
+
+	* XSD schema for XPROBEs XML output
+
+2004-09-05  mederchik
+
+	* changed XML output to comply with XSD schema
+
+2004-08-28  mederchik
+
+	* small initialization bug, resulted in failure to parse the config
+	file
+
+2004-06-09  mederchik
+
+	* minor cosmetic fix
+
+2004-06-09  mederchik
+
+	* some fixex for MacOSX, portscan progress report in percents
+
+2004-06-09  mederchik
+
+	* added endiannes check to USI++, updated config.sub and
+	config.guess
+
+2004-06-09  mederchik
+
+	* SHA1 is now part of xplib
+
+2003-12-29  mederchik
+
+	* dump select() in USIs sniffpack() for portability, localhost
+	should be now supported
+
+2003-10-15  mederchik
+
+	* fixed line wrapping bug
+
+2003-10-14  mederchik
+
+	* fixed reproted bugs
+
+2003-09-25  mederchik
+
+	* state of other ports is reported in xml output now
+
+2003-09-24  mederchik
+
+	* added check for generated incomplete fingerprints
+
+2003-09-24  mederchik
+
+	* hehe :) added tabs (promise this is last one)
+
+2003-09-24  mederchik
+
+	* made fingerprint output nicer
+
+2003-09-24  mederchik
+
+	* BUGFIX: added check on where do logging or not (forgot that :) )
+
+2003-09-23  mederchik
+
+	* XML output added, version is 0.2, updated README
+
+2003-09-23  mederchik
+
+	* Loggin class + XML logging
+
+2003-09-23  mederchik
+
+	* update from Ofir
+
+2003-08-20  mederchik
+
+	* -L output changed, added \n to unable to resolve message
+
+2003-08-20  mederchik
+
+	* added signature generation (-F), portscan is conducted in a
+	random port order, minor fixes
+
+2003-08-05  mederchik
+
+	* uncommited stuff, see CHANGELOG
+
+2003-07-12  fygrave
+
+	*
+	Updates from Ofir
+
+2003-07-12  fygrave
+
+	* Ofir's update 12/07/2003
+
+2003-07-03  mederchik
+
+	* update from Ofir (windoze and linux sigs added)
+
+2003-07-02  mederchik
+
+	* return OK;
+
+2003-07-02  mederchik
+
+	* change from map ptr to map
+
+2003-07-02  mederchik
+
+	* fix 10->0x10
+
+2003-07-02  mederchik
+
+	* update from Ofir
+
+2003-07-01  mederchik
+
+	* ok, several fixes for xprobe_module_param (_ZNZORIG, _ZNZVAL,
+	etc), also added another layer into xprobe_module_param, now
+	modules have to use Xprobe_Module_Param_ICMP or _TCP which defines
+	the parameter type for check_param(); also finished TCP Handshake
+	module, it is ready to go
+
+2003-07-01  mederchik
+
+	* fix BROKEN_BSD stuff: tot_len and frag_off were saved in host
+	byte order, but get_totlen() and get_fragoff() returned them in
+	network byte order
+
+2003-07-01  mederchik
+
+	* XProbe->Xprobe
+
+2003-07-01  mederchik
+
+	* new fingerprints file, includes new keywords
+
+2003-06-26  mederchik
+
+	* new tcp_handshake module
+
+2003-06-26  mederchik
+
+	* New type XPROBE_MODULE_PARAM_ZNZVAL
+
+2003-06-26  mederchik
+
+	* new tcp_handshake module
+
+2003-06-26  mederchik
+
+	* change the way TCP options are set in USI++, instead of padding
+	after each option set, do padding and set th_off when send_pack()
+	is called
+
+2003-06-26  mederchik
+
+	* Makefile with new module
+
+2003-06-26  mederchik
+
+	* beta version of the TCP handshake module. TODO: NONE value for
+	WSCALE and fingerprinting
+
+2003-06-24  mederchik
+
+	* fixed another bug reported by Ofir, added correct timeout checks
+	and more debugging
+
+2003-06-23  mederchik
+
+	* fix for bugreport from Ofir
+
+2003-06-08  mederchik
+
+	* more signatures from Ofir
+
+2003-06-03  mederchik
+
+	* bugfix - did not do osmtx->add_result(...XPROBE_MATCH_NO)
+
+2003-05-28  mederchik
+
+	* added ability to disable modules and specify number of matches to
+	display
+
+2003-05-28  mederchik
+
+	* bug reported by atterer@debian.org fixed as suggested (do not
+	build shared USI++ for now)
+
+2003-05-14  mederchik
+
+	* update from Ofir
+
+2003-05-07  mederchik
+
+	* fixed CFGDIR
+
+2003-05-07  mederchik
+
+	* last one to become GNU
+
+2003-05-07  mederchik
+
+	* Richard Atterer pointed out a bug, clear is removed
+
+2003-05-07  mederchik
+
+	* update from Ofir (windows 2003 server added)
+
+2003-04-29  fygrave
+
+	* new config.guess
+
+2003-04-23  fygrave
+
+	* License change
+
+2003-04-08  fygrave
+
+	*  Richard Atterer <atterer@debian.org> pointed bugs (and fixes)
+
+2003-04-07  fygrave
+
+	*
+	Cosmetic changes :) (welcome meder as author ;-))
+
+2003-04-06  mederchik
+
+	* new fingerprints from Ofir
+
+2003-04-04  mederchik
+
+	* 0.1 RELEASE minor fixes
+
+2003-04-04  mederchik
+
+	* STL includes fix
+
+2003-04-04  mederchik
+
+	* code cleanup, removed unused code
+
+2003-04-03  mederchik
+
+	* v.1.0 RC2 :)
+
+2003-04-03  mederchik
+
+	* IP constructor now sets the IP ID value to !0
+
+2003-04-01  mederchik
+
+	* updated AUTHORS file, update from Ofir for xprobe2.conf, fixed
+	xprobe_module_param RANGE type to match <=
+
+2003-03-25  mederchik
+
+	* update from Ofir to reflect new keyword, updated TODO
+
+2003-03-19  mederchik
+
+	* added new ip id keywords for each module, fixed build_DNS_reply()
+	that was causing segfaults with gcc v.3, moved all modules except
+	icmp_port_unreach to Xprobe_Module_Param
+
+2003-02-12  mederchik
+
+	* new type for xprobe_module_param + new VALUE (SENT) for
+	icmp_echo_ip_id
+
+2003-01-30  mederchik
+
+	* sig update from Ofir (IOSs and MAC OS)
+
+2003-01-20  mederchik
+
+	* fixed payload, now we should be RFC compliant
+
+2003-01-20  mederchik
+
+	* added new method and fixed the timestamp payload, now we should
+	be RFC compliant
+
+2002-12-07  mederchik
+
+	* small fix if no DNS record for www.securityfocus.com can be found
+
+2002-11-26  mederchik
+
+	* timestamp is defined in netinet/ip.h on linux, oh well we will
+	have Timestamp :)
+
+2002-11-24  mederchik
+
+	* not our UDP packet does not just put static ip into DNS reply,
+	but looks up ip of www.securityfocus.com and then puts the ip into
+	packet
+
+2002-11-24  mederchik
+
+	* moved payload funcs into ICMP class of USI++, added the right
+	payload for each ICMP probe
+
+2002-11-24  mederchik
+
+	* xp_get_src_addr() to return source IP for packets
+
+2002-11-24  mederchik
+
+	* xp_get_src_addr() added to support interface aliases
+
+2002-11-13  mederchik
+
+	* UNIX-like payload added to icmp echo req
+
+2002-11-13  mederchik
+
+	* xp_get_ping_payload() UNIX like payload for pings
+
+2002-11-06  mederchik
+
+	* fixed calc_ipsum(), bug reported by Jamie Van Randwyk
+
+2002-11-04  mederchik
+
+	* xp_get_random_data() added
+
+2002-10-21  mederchik
+
+	* using namespace std; added
+
+2002-10-10  mederchik
+
+	* fix for ioctl(SIOCGIFFLAGS)
+
+2002-09-28  mederchik
+
+	* updated man (-p) and -h
+
+2002-09-23  mederchik
+
+	* -p added + ttl_calc prints * now
+
+2002-09-12  mederchik
+
+	* updated new-fingerprints-howto
+
+2002-09-10  mederchik
+
+	* tell user of failed ttl precalculation
+
+2002-09-10  mederchik
+
+	* new man page (-r included)
+
+2002-09-10  uid32118
+
+	* Ofir's update :)
+
+2002-09-09  mederchik
+
+	* solaris 9 added
+
+2002-09-07  mederchik
+
+	* added -r support for traceroute-like output
+
+2002-09-01  mederchik
+
+	* get rid of -i completely (cmdopts())
+
+2002-08-26  fygrave
+
+	* update from Ofir
+
+2002-08-26  fygrave
+
+	* Fingerprints howto :-)
+
+2002-08-25  mederchik
+
+	* minor fix for the default config file path (needed slash)
+
+2002-08-24  fygrave
+
+	* Ofir's update on OpenBSD 3.1.x :-)
+
+2002-08-24  fygrave
+
+	* make install fixes.
+
+2002-08-24  fygrave
+
+	* config dir fixes.
+
+2002-08-21  mederchik
+
+	* added TTL fuzziness
+
+2002-08-21  fygrave
+
+	* Update from Ofir.
+
+2002-08-17  mederchik
+
+	* fuzzines in TTL matching
+
+2002-08-17  mederchik
+
+	* GPL
+
+2002-08-15  mederchik
+
+	* document -c and get rid of -i
+
+2002-08-14  mederchik
+
+	* patch submitted by Jamie Van Randwyk (fixes bug in interface
+	lookup)
+
+2002-08-14  mederchik
+
+	* fixed hardcoded number of keywords (my fault)
+
+2002-08-14  mederchik
+
+	* fixed bug (registered extra keywords)
+
+2002-08-12  mederchik
+
+	* signature updates
+
+2002-08-11  mederchik
+
+	* fix in ip_sum calculation
+
+2002-08-10  fygrave
+
+	* Sigs update from Ofir :)
+
+2002-08-10  fygrave
+
+	* Signature fixes.  More "debuggery" to icmp_echo_id Meder: you
+	cant do if (foo == "bar") .. if foo is char *, only if doo is
+	string, otherwise you have to use strcmp ;-)
+
+2002-08-09  fygrave
+
+	* it is 0xc0 not Oxc0 ;-)
+
+2002-08-09  fygrave
+
+	* Oops.. it is icmp_echo_ip_id, not icmp_echo_id, damn ;p
+
+2002-08-09  mederchik
+
+	* got rid of setfilter() + minor cleaning
+
+2002-08-08  mederchik
+
+	* fixed icmp_unreach_echoed_dtsize parsing, it is UDP
+	header+payload
+
+2002-08-08  fygrave
+
+	* More files.
+
+2002-08-08  fygrave
+
+	* initial commit
+
+2002-08-08  fygrave
+
+	* initial commit
+
+2002-08-08  fygrave
+
+	* Initial commit
+

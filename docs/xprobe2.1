@@ -1,0 +1,219 @@
+.\" $Id: xprobe2.1,v 1.18 2005/07/26 12:48:59 mederchik Exp $ */
+.\"
+.\" Copyright (C) 2001-2002 Fyodor Yarochkin <fygrave@tigerteam.net>,
+.\"                    	    Ofir Arkin       <ofir@sys-security.com>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+
+.\" Generate man page: groff -man -Tascii xprobe.1 
+
+.TH XPROBE2  "$Id: xprobe2.1,v 1.18 2005/07/26 12:48:59 mederchik Exp $"
+.SH NAME
+xprobe2 \- A Remote active operating system fingerprinting tool.
+.SH SYNOPSIS
+.na
+.B xprobe2
+[
+.B \-v
+] [
+.B \-r
+] [
+.B \-p
+.I proto:portnum:state
+] [
+.B \-c
+.I configfile
+] [
+.B \-o
+.I logfile
+] [
+.B \-p
+.I port
+] [
+.B \-t
+.I receive\_timeout
+] [
+.B \-m
+.I numberofmatches
+] [
+.B \-D
+.I modnum
+] [
+.B \-F
+] [
+.B \-X
+] [
+.B \-B
+] [
+.B \-A
+] [
+.B \-T
+.I port spec
+] [
+.B \-U
+.I port spec
+]
+.I host
+.br
+.ad
+.SH DESCRIPTION
+.LP
+\fIxprobe2\fP is an active operating system fingerprinting tool with a 
+different approach to operating system fingerprinting. xprobe2 relies on
+fuzzy signature matching, probabilistic guesses, multiple matches
+simultaneously, and a signature database.
+.LP
+The operation of \fIxprobe2\fP is described in a paper titled "xprobe2 - A 
+\'Fuzzy\' Approach to Remote Active Operating System Fingerprinting", which is
+available from http://www.sys-security.com/html/projects/X.html. 
+.LP
+As \fIxprobe2\fP uses raw sockets to send probes, you must have
+.B root
+privileges in order for \fIxprobe2\fP to be able to use them.
+.SH OPTIONS
+.TP
+.B \-v
+be verbose.
+.TP
+.B \-r
+display route to target (traceroute-like output).
+.TP
+.B -c
+use \fIconfigfile\fP to read the configuration file, xprobe2.conf, from a 
+non-default location.
+.TP
+.B -D
+disable module number \fImodnum\fP.
+.TP
+.B -m
+set number of results to display to \fInumofmatches\fP.
+.TP
+.B -o
+use \fIlogfile\fP to log everything (default output is stderr).
+.TP
+.B -p
+specify port number (\fIportnum\fP), protocol (\fIproto\fP) and it's \fIstate\fP for \fIxprobe2\fP to use during rechability/fingerprinting tests of remote host. Possible values for \fIproto\fP are \fB tcp\fP or \fB udp\fP, \fIportnum\fP can only take values from \fB 1\fP to \fB65535\fP, \fIstate\fP can be either \fBclosed\fP (for \fB tcp\fP that means that remote host replies with RST packet, for \fB udp\fP that means that remote host replies with ICMP Port Unreachable packet) or \fBopen\fP (for \fB tcp\fP that means that remote host replies with SYN ACK packet and for \fB udp\fP that means that remote host doesn't send any packet back). 
+.TP
+.B -t
+set receive timeout to \fIreceive\_timeout\fP in seconds (the default is set to 10 seconds).
+.TP
+.B -F
+generate signature for specified target (use -o to save fingerprint into file)
+.TP
+.B -X
+write XML output to logfile specified with \fB-o\fP
+.TP
+.B -B
+causes \fIxprobe2\fP to be a bit more noisy, as \fB-B\fP makes TCP handshake module to try and blindly guess an open TCP port on the target, by sending sequential probes to the following well-known ports: 80, 443, 23, 21, 25, 22, 139, 445 and 6000 hoping to get SYN ACK reply. If \fIxprobe2\fP receives RST|ACK or SYN|ACK packets for a port in the list above, it will be saved in the target port database to be later used by other modules (i.e. RST module).
+.TP
+.B -T, -U
+enable built-in portscanning module, which will attempt to scan TCP and/or UDP ports respectively, which were specified in \fIport spec\fP
+.TP
+.B -A
+enable experimental support for detection of transparent proxies and firewalls/NIDSs spoofing RST packets in portscanning module. Option should be used in conjunction with -T. All responses from target gathered during portscanning process are divided in two classes (SYN|ACK and RST) and saved for analysis. During analysis module will search for different packets, based on some of the fields of TCP and IP headers, withing the same class and if such packets are found, message will be displayed showing different packets withing the same class.
+.SH EXAMPLES
+.LP
+.RS
+.nf
+\fBxprobe2 -v -D 1 -D 2 192.168.1.10\fP
+.fi
+
+.Sp
+Will launch an OS fingerprinting attempt targeting 192.168.1.10. Modules 1 and 2, which are reachability tests, will be disabled, so probes will be sent even if target is down. Output will be verbose.
+
+.RE
+.RS
+.nf
+\fBxprobe2 -v -p udp:53:closed 192.168.1.20\fP
+.fi
+
+.Sp
+Will launch an OS fingerprint attempt targeting 192.168.1.20. The UDP destination port is set to 53, and the output will be verbose.
+
+.RE
+.RS
+.nf 
+\fBxprobe2 -M 11 -p tcp:80:open 192.168.1.1\fP
+.fi
+
+.Sp
+Will only enable TCP handshake module (number 11) to probe the target, very usefull when all ICMP traffic is filtered.
+.RE
+.RS
+
+.nf
+\fBxprobe2 -B 192.168.1.1\fP
+.fi
+
+.Sp
+Will cause TCP handshake module to try blindly guess open port on the target by sequentially sending TCP packets to the most likely open ports (80, 443, 23, 21, 25, 22, 139, 445 and 6000).
+.RE
+
+.RS
+.nf
+\fBxprobe2 -T 1-1024 127.0.0.1\fP
+.fi
+
+.Sp
+Will enable portscanning module, which will scan TCP ports starting from 1 to 1024 on 127.0.0.1
+.RE
+
+.RS
+.nf
+\fBxprobe2 -p tcp:139:open 192.168.1.2\fP
+.fi
+
+.Sp
+If remote target has TCP port 139 open, the command line above will enable application level SMB module (if remote target has TCP port 445 open, substitue 139 in the command line with 445).
+.RE
+
+.RS
+.nf
+\fBxprobe2 -p udp:161:open 192.168.1.10\fP
+.fi
+
+.Sp
+Will enable SNMPv2c application level module, which will try to retrieve sysDescr.0 OID using community strings taken from xprobe2.conf file.
+.RE
+
+
+.SH NOTES
+\fIxprobe2\fP fingerprints remote operating system by analyzing the replies from the target, so to get the most out of \fIxprobe2\fP you need to supply \fIxprobe2\fP with as much information as possible, in particular it is important to supply at least one open TCP port and one closed UDP port. Open TCP port can either be provided in command line (\fB-p\fP), obtained through built-in portscanner (\fB-T\fP) or \fB-B\fP option can be used to cause \fIxprobe2\fP to try to blindly guess open TCP port. UDP port can be supplied via command line (\fB-p\fP) or through built-in portscanner (\fB-U\fP).
+
+.SH HISTORY
+xprobe has been developed in 2001 based  on research performed by Ofir
+Arkin <ofir@sys-security.com>. The code has been officially released at the
+BlackHat Briefings in Las-Vegas in 2001. xprobe2 is a logical evolution of
+xprobe code. Signature based fuzzy fingerprinting logic was embedded.
+.SH "SEE ALSO"
+nmap(1) queso(1) pcap(3)
+.SH AUTHORS
+Fyodor Yarochkin <fyodor@o0o.nu>, Ofir Arkin <ofir@sys-security.com>, Meder Kydyraliev <meder@o0o.nu>
+.PP
+(see also CREDITS in distro tarball).
+.SH AVAILABILITY
+The current version and relevant documentation is available from following urls:
+.br
+.I http://www.sys-security.com/html/projects/X.html
+.br
+.I http://xprobe.sourceforge.net
+.br
+.I http://www.notlsd.net/xprobe/
+.SH BUGS
+None known (please report). 
+
+

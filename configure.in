@@ -1,0 +1,226 @@
+# $Id: configure.in,v 1.15 2005/07/18 10:53:40 mederchik Exp $
+#
+# Copyright (C) 2001 Fyodor Yarochkin <fygrave@tigerteam.net>,
+#                    Ofir Arkin       <ofir@sys-security.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+AC_INIT(src/xprobe.cc)
+AC_LANG_CPLUSPLUS
+AC_ARG_PROGRAM
+
+PACKAGE=xprobe2
+VERSION='0.3'
+
+if test "x$sysconfdir" != xNONE; then
+	if test "x$prefix" = xNONE; then
+		prefix="$ac_default_prefix"
+	fi 
+    CFGDIR="`eval echo $sysconfdir`/xprobe2"
+else
+    CFGDIR="$ac_default_prefix/etc/xprobe2"
+fi    
+
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
+AC_SUBST(CFGDIR)
+AC_CONFIG_HEADER(src/config.h)
+AC_CONFIG_AUX_DIR(cfg-scripts)
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_RANLIB
+SOURCES=`cd src; ls *.cc | awk ' { printf "%s ", $1 } '`
+AC_SUBST(SOURCES)
+HEADERS=`cd src; ls *.h | awk '!/defines.h|config.h/{ printf "%s ", $1 }'`
+AC_SUBST(HEADERS)         
+
+# XXX: add -Werror for the final version
+# remove -Wmissing-prototypes, as they cause warnings
+if test -n "$GCC"; then
+    CPPFLAGS="$CPPFLAGS -Wall -W -Wcast-align \
+-Wcast-qual -Wshadow" #-Wwrite-strings
+fi
+
+AC_ARG_ENABLE(debug,
+[ --enable-debug       enable debugging )],
+                [ if test -n "$GCC"; then
+                    CPPFLAGS="$CPPFLAGS -DDEBUG -ggdb"
+                  else
+                    CPPFLAGS="$CPPFLAGS -DDEBUG"
+                  fi      
+                ], )
+AC_CANONICAL_HOST
+case "$host" in
+    *-solaris*)
+        AC_DEFINE(SOLARIS,,Solaris OS)
+        LDFLAGS="${LDFLAGS} -lsocket -lnsl -lresolv -ldl"
+        HAVE_LIBDL=1
+        ;;
+    *-linux*)
+        AC_DEFINE(LINUX,,Linux OS)    
+        LDFLAGS="${LDFLAGS} -ldl -rdynamic"
+        HAVE_LIBDL=1
+        ;;
+esac    
+
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(strings.h)
+AC_CHECK_HEADERS(string.h)
+AC_CHECK_HEADERS(stdlib.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(glib.h)
+AC_CHECK_HEADERS(dlfcn.h)
+#AC_C_CONST
+
+#AC_CHECK_TYPE(uint8_t,  unsigned char)
+#AC_CHECK_TYPE(uint16_t, unsigned short)
+#AC_CHECK_TYPE(uint32_t, unsigned long)
+
+AC_CACHE_CHECK([if sa_len is in struct sockaddr], ac_cv_sockaddr_sa_len,
+AC_TRY_COMPILE([
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>]
+,[ printf("%i\n", ((struct sockaddr *)NULL)->sa_len); ],
+[  
+   ac_cv_sockaddr_sa_len=yes
+]
+  ,[
+   ac_cv_sockaddr_sa_len=no
+   ]))
+
+if test "$ac_cv_sockaddr_sa_len" = "yes"; then
+	AC_DEFINE(HAVE_SOCKADDR_SA_LEN,,Struct sockaddr has sa_len member)
+fi
+
+AC_ARG_WITH(libpcap_includes,
+	[ --with-libpcap-includes=DIR  libpcap include directory],
+	[with_libpcap_includes="$withval"],[with_libpcap_includes=no])
+
+AC_ARG_WITH(libpcap_libraries,
+	[ --with-libpcap-libraries=DIR  libpcap library directory],
+	[with_libpcap_libraries="$withval"],[with_libpcap_libraries=no])
+
+if test "$with_libpcap_includes" != "no"; then
+   CPPFLAGS="${CPPFLAGS} -I${with_libpcap_includes}"
+fi
+
+if test "$with_libpcap_libraries" != "no"; then
+   LDFLAGS="${LDFLAGS}  -L${with_libpcap_libraries}"
+fi
+
+LPCAP=""
+AC_CHECK_LIB(pcap, pcap_datalink,, LPCAP="no")
+
+if test "$LPCAP" = "no"; then
+  echo
+  echo "   ERROR!  Libpcap library/headers not found."
+  echo "   http://www.tcpdump.org/ is a good place to fetch one"
+  echo "   if libpcap library is installed, use the --with-libpcap-* options"
+  echo "   to specify pathes to include and library files locations."
+  exit
+fi
+ 
+AC_ARG_WITH(libusipp_includes,
+	[ --with-libusipp-includes=DIR  libusipp include directory],
+	[with_libusipp_includes="$withval"],[with_libusipp_includes=no])
+
+AC_ARG_WITH(libusipp_libraries,
+	[ --with-libusipp-libraries=DIR  libusipp library directory],
+	[with_libusipp_libraries="$withval"],[with_libusipp_libraries=no])
+
+if test "$with_libusipp_includes" != "no"; then
+   CPPFLAGS="${CPPFLAGS} -I${with_libusipp_includes}"
+fi
+
+if test "$with_libusipp_libraries" != "no"; then
+   LDFLAGS="${LDFLAGS}  -L${with_libusipp_libraries}"
+fi
+
+#AC_CACHE_CHECK(if libusi++ works, ac_cv_have_libusipp, 
+#AC_TRY_COMPILE([
+#
+##include <stdio.h>
+##include <usi++/usi++.h>
+##include <usi++/tcp.h>
+##include <unistd.h>
+#
+#],[
+#    TCP *tmp = new TCP("foo");
+#
+#    TCP tcp(*tmp);
+#
+#], ac_cv_have_libusipp=yes, 
+#   ac_cv_have_libusipp=no
+#   ))
+#
+#
+#if test "$ac_cv_have_libusipp" = "no"; then
+#  echo
+#  echo "   ERROR!  Libusi++ library/headers not found."
+#  echo "   http://www.cs.uni-potsdam.de/homepages/students/linuxer/"
+#  echo "   is a good place to fetch one. (a copy avail. at our page too)."
+#  echo "   if libusipp library is installed, use the --with-libusipp-* options"
+#  echo "   to specify pathes to include and library files locations."
+#  exit
+#fi
+#LIBS="-lusi++ $LIBS"
+
+AC_CHECK_HEADERS(dlfcn.h,HAVE_DLFCN_H=1, DL_FAIL=1)
+if test "$HAVE_DLCFCN_H" = 1; then
+    if test "$HAVE_LIBDL" = 1; then
+        AC_CHECK_LIB(dl,dlopen,,DL_FAIL=1)
+    else
+        AC_CHECK_LIB(c,dlopen,,DL_FAIL=1)
+    fi
+fi
+
+if test "$DL_FAIL" = 1; then
+    AC_MSG_WARN("Dynamically loadable tests will not be supported");    
+    AC_DEFINE(STATIC_TESTS,, Static Tests)
+else
+    DYNFLAGS="-fPIC -shared"
+    AC_SUBST(DYNFLAGS)
+fi
+
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+#subdirs="libs-external/USI++/src"
+
+AC_CONFIG_SUBDIRS("libs-external/USI++/src")
+
+AC_OUTPUT([
+Makefile
+src/defines.h
+src/Makefile
+src/xplib/Makefile
+src/xpmodules/Makefile
+src/xpmodules/alive_probe/Makefile
+src/xpmodules/alive_probe/ttl_calc/Makefile
+src/xpmodules/alive_probe/portscanner/Makefile
+src/xpmodules/os_probe/Makefile
+src/xpmodules/os_probe/icmp_echo_id/Makefile
+src/xpmodules/os_probe/icmp_timestamp/Makefile
+src/xpmodules/os_probe/icmp_addrmask/Makefile
+src/xpmodules/os_probe/icmp_inforeq/Makefile
+src/xpmodules/os_probe/icmp_port_unreach/Makefile
+src/xpmodules/os_probe/tcp_handshake/Makefile
+src/xpmodules/os_probe/tcp_rst/Makefile
+src/xpmodules/os_probe/smb/Makefile
+src/xpmodules/os_probe/snmp/Makefile
+])

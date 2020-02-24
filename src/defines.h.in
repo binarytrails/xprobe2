@@ -1,0 +1,168 @@
+/* $Id: defines.h.in,v 1.17 2005/07/18 11:08:24 mederchik Exp $ */
+/*
+** Copyright (C) 2001 Fyodor Yarochkin <fygrave@tigerteam.net>,
+**                    Ofir Arkin       <ofir@sys-security.com>
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+#ifndef DEFINES_H
+#define DEFINES_H
+
+#define VERSION "@VERSION@"
+#define BANNER \
+"\nXprobe2 v."VERSION\
+" Copyright (c) 2002-2005 fyodor@o0o.nu, ofir@sys-security.com, meder@o0o.nu"\
+"\n"
+
+#define DATA_SIZE 20
+#define DEF_TIMEOUT 10
+#define DEF_SEND_DELAY 0.01
+#define PACKBUF_SIZ 1024
+#define DEFAULT_CONFIG "@CFGDIR@/xprobe2.conf"
+#define DEFAULT_MATCHES 10
+
+#define UDP_PORT 32132
+#define UDP_DATA_SIZE 70
+#define UDP_LEN_ALL (sizeof(struct ip) + sizeof(struct udphdr) + UDP_DATA_SIZE)
+
+#define PING_PAYLOAD_SIZE 56
+
+#define TEST_RESULT_BROKEN -1
+#define TEST_RESULT_ZERO    0
+#define TEST_RESULT_GOOD    1
+#define TEST_RESULT_BAD     2
+
+#define UDP_CKSUM_BADDGRAM TEST_RESULT_BROKEN
+#define UDP_CKSUM_ZERO      TEST_RESULT_ZERO
+#define UDP_CKSUM_BAD       TEST_RESULT_BAD
+#define UDP_CKSUM_GOOD      TEST_RESULT_GOOD
+
+#define IP_CKSUM_ZERO      TEST_RESULT_ZERO
+#define IP_CKSUM_BAD       TEST_RESULT_BAD
+#define IP_CKSUM_GOOD      TEST_RESULT_GOOD
+
+#define IP_ID_ZERO          TEST_RESULT_ZERO
+#define IP_ID_BAD           TEST_RESULT_BAD
+#define IP_ID_GOOD          TEST_RESULT_GOOD
+#define IP_ID_FLIPPED       (TEST_RESULT_BAD + 1)
+
+/* we don't expect packets bigger than 1500 */
+#define LPCAP_SNAPLEN       1500
+#define LPCAP_TIMEOUT       2000
+
+/* return values for ICMP_UNREACH length check */
+
+#define ICMPUNREACH_LEN_OK  1
+#define ICMPUNREACH_LEN_GT  2
+#define ICMPUNREACH_LEN_LS  3
+
+/* return values for frag bits test */
+
+#define FRAG_BITS_OK        0
+#define FRAG_BITS_FLIPPED   1
+#define FRAG_BITS_ZERO      2
+
+/* TTL_DELTA for fuzzy TTL matching */
+
+#define TTL_DELTA			25
+
+/* defines for tcp_ports, udp_ports and protocols maps */
+
+#define XPROBE_TARGETP_OPEN 1
+#define XPROBE_TARGETP_CLOSED 2
+#define XPROBE_TARGETP_FILTERED 3
+
+
+#define MAXIFNUM 64
+
+/* DSO modules stuff */
+
+#if defined(LINUX) || defined(__FreeBSD__)
+#define DLOPENFLAGS     RTLD_LAZY | RTLD_GLOBAL
+#define DLSYMPREFIX    ""
+#else
+#define DLOPENFLAGS     RTLD_LAZY
+#define DLSYMPREFIX    "_"
+#endif
+
+#define N_TESTNAME "test_name"
+#define N_TESTTYPE "test_type"
+#define N_TEST_INIT "test_init"
+#define N_TEST_RUN "test_run"
+#define N_TEST_FINI "test_fini"
+
+#define XPROBE_MODULE_ENABLED 0
+#define XPROBE_MODULE_DISABLED 1
+
+/* some misc stuff */
+
+#define FAIL		-1
+#define OK			0
+#define RETRY		-2
+#define TRUE		1 
+#define FALSE		0
+
+#define XPROBE_DEBUG_ALL          0xffffffff
+#define XPROBE_DEBUG_SIGNATURES   1
+#define XPROBE_DEBUG_DSOTESTS     2
+#define XPROBE_DEBUG_INIT         4
+#define XPROBE_DEBUG_MODULES      8
+#define XPROBE_DEBUG_OSMATRIX    16  
+#define XPROBE_DEBUG_CONFIG      32
+#define XPROBE_DEBUG_TARGET      64
+
+#define XPROBELOG_XP_SESS_START     1
+#define XPROBELOG_MSG_RUN           2
+#define XPROBELOG_MOD_SESS_START    3
+#define XPROBELOG_MSG_MODULE        4
+#define XPROBELOG_MOD_SESS_END      5
+#define XPROBELOG_TG_SESS_START     6
+#define XPROBELOG_REACH_SESS_START  7
+#define XPROBELOG_MSG_STATE         8
+#define XPROBELOG_MSG_RTT           9
+#define XPROBELOG_REACH_SESS_END    10
+#define XPROBELOG_INFO_SESS_START   11
+#define XPROBELOG_PS_SESS_START     12
+#define XPROBELOG_STATS_SESS_START  13
+#define XPROBELOG_MSG_PS_TCPST      14
+#define XPROBELOG_MSG_PS_UDPST      15
+#define XPROBELOG_STATS_SESS_END    16
+#define XPROBELOG_PSDET_SESS_START  17
+#define XPROBELOG_MSG_PORT          18
+#define XPROBELOG_PSDET_SESS_END    19
+#define XPROBELOG_PS_SESS_END       20
+#define XPROBELOG_INFO_SESS_END     21
+#define XPROBELOG_GUESS_SESS_START  22
+#define XPROBELOG_MSG_PRIMARY       23
+#define XPROBELOG_MSG_SECONDARY     24
+#define XPROBELOG_GUESS_SESS_END    25
+#define XPROBELOG_TG_SESS_END       26
+#define XPROBELOG_XP_SESS_END       27
+#define XPROBELOG_OTHER_TCPP		28
+#define XPROBELOG_OTHER_UDPP		29
+
+#ifndef DEFAULT_DEBUG_LEVEL
+#define DEFAULT_DEBUG_LEVEL 0
+#endif
+
+#define xprobe_debug(level, fmt, args...) ui->debug(level,\
+__FILE__, __LINE__, fmt, args)
+
+#define xprobe_mdebug(level, str) ui->debug(level,\
+__FILE__, __LINE__, str)
+
+#endif /* DEFINES_H */

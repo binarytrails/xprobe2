@@ -1,0 +1,19 @@
+Meanwhile, libUSI++ runs on a lot of OS's with even different
+hw-architecture.
+
+
+Note that FreeBSD is only available on x86 and alpha.
+'?' means that i couldn't test it on these platforms yet.
+
+
+
+		    x86		sparc	       PPC	      Alpha
+    
+OpenBSD		     Y		 Y		?		?
+
+FreeBSD		     Y		 -		-		Y
+
+NetBSD		     Y		 Y	        ?		?
+
+Linux		     Y		 ?		Y		Y
+

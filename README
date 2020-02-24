@@ -1,0 +1,120 @@
+$Id: README,v 1.5 2004/12/16 10:13:26 mamezo Exp $
+--
+    
+Xprobe2 is a remote active operating system fingerprinting tool.
+Xprobe2 uses advanced technics, such as the usage of fuzzy logic
+to match fingerprinting results with the tool's signature database,
+unique fingerprinting methods and other, to provide with accurate
+results.
+
+Xprobe2 has evolved from the original Xprobe tool, but it has been
+completely rewritten from scratch in C++.
+
+
+
+License
+-------
+Xprobe2 is distributed under GNU license. See COPYING for more details.
+
+The fingerprinting database is is available for free use by open source 
+software under the terms of the GNU General Public License.
+
+For commercial usage please contact: ofir@sys-security.com
+    
+        
+Requirements
+------------
+
+- A C++ compiler. (gcc will do)
+
+- libusi++ (included with the distribution)
+
+- lipcap (use version 0.6.x or later)
+  If libpcap is not installed in standard path, use --with-libpcap-libraries=/path/ 
+  and --with-libcap-includes=/path options.
+
+
+Supported platforms
+-------------------
+
+The tool has been succesefully compiled and tested under the following platforms:
+
+FreeBSD 4.x, 5.x 
+Linux 2.0.x, 2.2.x, 2.4.x
+Solaris 2.x
+OpenBSD 2.x, 3.x
+NetBSD 1.4.x, 1.5.x, 1.6.x
+IRIX (with SGI freeware libpcap, http://freeware.sgi.com/, naitive SGI compiler).
+
+
+Platforms which we are able to fingerprint
+------------------------------------------
+
+see etc/xprobe2.conf
+
+
+How to install
+---------------
+
+tar xvfz xprobe2-{release}.tar.gz
+cd xprobe-{release}
+./configure
+(or ./configure --with-libpcap-libraries=/usr/local/lib --with-libcap-includes=/usr/local/include)
+make
+make install
+
+send complains to fygrave@tigerteam.net if the compilation breaks. (use
+--enable-debug to track/report errors)
+
+
+How to use:
+-----------
+
+See manual for details or use the -h command line to list available options.
+
+
+Architecture
+------------
+
+Xprobe2 consists of 2 major parts: core fingerprinting engine which
+includes fuzzy signatures matching engine, signatures processing,
+and is generally intrefacing between the modules, and tests, which
+are presented as (extrenal) dynamically loadable shared modules.
+
+Core module has no idea about the signatures nor how they are being
+applied to received packets. Please see fuzzy_fingerprinting paper in
+docs for details.    
+
+Xprobe2 modules are supposed to provide routines for signature element
+parsing for each module, module names, initialization routines, module
+execution routines, module deinitialization signatures and other
+specific information. Please see docs/modules_howto.txt for details.
+
+
+Docs & Updates
+--------------
+
+http://www.sys-security.com/html/projects/X.html
+
+
+Other related webpages
+----------------------
+
+http://o0o.nu/sec/xprobe/
+http://www.sourceforge.net/projects/xprobe/
+http://xprobe.sourceforge.net/
+
+
+Where to mail bugs/questions/ideas/patches/fixes:
+-------------------------------------------------
+
+ Fyodor Yarochkin <fygrave@o0o.nu>         Ofir Arkin <ofir@sys-security.com>
+ http://o0o.nu                             The Sys-Security Group
+                                           http://www.sys-security.com
+ 
+ Meder Kydyraliev <meder@o0o.nu>
+                                 
+Flames
+-------
+
+/dev/null                                   

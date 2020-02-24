@@ -1,0 +1,126 @@
+USI++ README
+============
+
+0. About
+--------
+
+USI++ is a product developed by Sebastian Krahmer, krahmer@cs.uni-potsdam.de
+It is a low-level network-library for sending/receiving IP-packets
+directly on so called 'raw sockets'. It can be used for network-monitoring
+also. Since version 1.2 it uses the packet capture library libpcap that
+is a portable library for fetching network-traffic on the datalink-layer.
+
+To get the lattest libpcap with full linux-features, you should visit
+
+http://www.tcpdump.org
+
+I strongly suggest to use latest pcap version from tcpdump.org since
+some distributors ship broken/old versions of it. To get full 
+capturing support, strong libpcap is needed.
+
+NOTE that my pcap-stuff (LSF and "any" patch) will be available
+     in future on tcpdump.org than on my personal site.
+      
+USI++ in lattest version is always available on
+
+http://www.cs.uni-potsdam.de/homepages/students/linuxer
+
+
+1. License
+----------
+
+USI++ comes under the GPL. See file COPYING for more
+details. 
+
+ *	This product includes software developed by the Computer Systems
+ *	Engineering Group at Lawrence Berkeley Laboratory.
+
+(libpcap)
+
+Also a data-file for ethernet-MAC's is included. It was taken from
+arpwatch.
+
+Since USI++ is GPL there is ABSOLUTELY NO WARRANTY. YOU USE IT AT YOUR OWN RISK.
+Some exapmles that are shipped with this library may look strange to you.
+All the code was written FOR EDUCATIONAL PURPOSES ONLY! This includes the so called
+'sniffers', 'spoofers' and so on. 
+NOTE that it is maybe illegal in your country to use such programs. So only use
+it on/against your own computers without other involved persons!
+
+2. Install
+----------
+
+# configure
+# make
+# make install
+
+Please report any problems regarding the installation-procedure
+to krahmer@cs.uni-potsdam.de.
+
+3. Compiling the examples
+-------------------------
+
+# c++ foo.cc -lusi++ -lpcap
+
+4. Function-description
+-----------------------
+
+Please look at the HTML-documentation of libusi++.
+
+
+5. Supported Platforms
+----------------------
+
+See PLATFORMS file.
+
+To make USI++ work properly on new Linux 2.4 kernels,
+make sure you disable 'connection tracking' in kernel.
+At best you compile connection tracking (if you need it for NAT)
+as modules and remove them when playing with USI++.
+This is because connection tracking forbids to send arbitrary
+TCP packets which don't belong to any connection.
+
+    
+6. BUGS/TODO
+------------
+
+The TCP-options are alpha-state. I need to play around with different
+(little/big-endian) systems to figure out complete behaivior.
+
+On FreeBSD 3.1 you need to install this or a newer version b/c the 
+default C++ compiler doesn't support namespaces.
+The STL-headerfiles shipped with redhat 6.x and freeBSD 3.3 are broken (g++3).
+If you get compiler-errors when compiling ip.cc that tell you that there is
+a mess with stl_alloc.h, you can copy the fixed stl_alloc.h (directory fix)
+to the specified dir.
+
+
+7. Background for Layer 2
+-------------------------
+
+The linklevel handling has changed. Now all classes are derived from
+Layer2 {} which contains a RX and a TX object which are used for
+receiving and transmitting data. The class-declarations can be found
+in the coresponding .h files. These classes are abstract, this means
+you must derive your own to get it working. Look at the .h files
+which functions you must implemet. USI++ ships with two classes
+Pcap {} and TX_IP {} which let you capture/send packets. They give you
+basic functionality so that you can use programs that work with USI++ 1.67 or
+lower as normal.
+By making RX {} and TX {} abstract we make sure that Layer2 {} can access
+routines such as sendpack(). You are free to write your own RX/TX based
+classes for different hardware (FDDI,...). You can change RX/TX behaivior at runtime,
+so it is as flexible as possible. For example you could detect that you are
+working with PPP and then you load PPP transimitter.
+Have fun.
+
+Papers, books,...
+-----------------
+
+[1] RFC 793, 791, 792, 826
+[2] http://www.packetfactory.net
+[3] UNIX Network Programming, W. R. Stevens, Prentice Hall 1998
+[4] http://teso.scene.at
+[5] include/netinet/*.h
+[6] include/net/*.h
+

@@ -1,0 +1,320 @@
+$Id: new-fingerprints-howto.txt,v 1.5 2005/06/26 11:23:20 mederchik Exp $
+New Fingerprints How To: xprobe2.conf contributions guide
+
+Ofir Arkin (ofir@sys-security.com)
+Fyodor Yarochkin (fygrave@tigerteam.net)
+Last modified: 26 June 2005
+
+-----------------------------------------------------------------------
+*NOTE:
+Xprobe2 now has '-F' command line switch which frees you from the need to
+run tcpdump and analyze traffic, '-F' will generate a complete fingerprint
+for you. Please refer to the manual page for details.
+-----------------------------------------------------------------------
+
+Introduction
+Xprobe2 stores its fingerprinting database in a file called "xprobe2.conf". 
+The file can be found under the "etc" directory with the supplied code. When 
+a 'make install' is executed the file will be copied to '$prefix/etc/xprobe2/'. 
+
+When attempting to execute the program, the program will search for the 
+configuration file in the '$prefix/etc' directory. You can specify the 
+location of the file using the '-c' option. 
+
+This How-To provides information on how to add your own signatures into the 
+signature database, i.e. the 'xprobe2.conf' file. You may choose to share your 
+signatures with the public, either by publishing them yourself or by submitting
+your signatures to us to be included with the distribution's 'xprobe2.conf' 
+file.
+
+The How-To also provides information on how to produce the appropriate tests
+allowing one to add his own fingerprints information.
+
+
+How to produce the fingerprinting tests
+=======================================
+The easiest way to produce the tests requiered, is to execute Xprobe2 against
+a machine running a certain operating system, a networking device, a game 
+consule etc. 
+
+The target should not be filtered, either by a local firewall or by a 
+centrlized firewall, or tunnable parametrs used to obscure its way of
+operation.
+
+Using tcpdump, one should have all the information it needs to add the 
+particular signature of an operating system, a networking device, etc. 
+to be supported with Xprobe2.
+
+It is advised to use the following tcpdump command:
+
+tcpdump -xnvv -s 1600 host <TARGET HOST IP>
+
+Use the -d 8 switch (see 'src/defines.h' for more information on debugging) to
+"debug" newly-added signatures.
+
+
+Syntax
+======
+
+fingerprint {
+    OS_ID = "your operating system ID string"
+    # your comments
+    module_keyword = value
+}
+
+You can omit some keywords from your fingerprint entry. Although it will not
+affect the operational aspect of the program, it will affect the final 
+probability guessing, that could not be 100%.
+
+One can add his own Keywords to the signatures. For those new keywords to make
+affect, they need to be defined with the appropriate module which will use them.
+ 
+
+The Signature Database How-To
+=============================
+The signature database contains a demo entry, which this text explains.
+
+
+fingerprint {
+
+This is a change control entry:
+
+	OS_ID = "My OS"
+	#Entry inserted to the database by: Moderator's name (email)
+	#Entry contributed by: Contributer's name (email)
+	#Date: Date entered into database
+	#Modified: Date Modified
+
+You should provide the OS name under "My OS". This is the name which will be
+printed by the program when appropriate match/guess will be produced. 
+
+You can also provide some other cosmetic information such as the date you 
+entered the entry, the date this entry was modified, or any other information
+you like, providing that a hash sign ('#') will start the line.
+
+
+
+Module A (Xprobe modules number 3)
+The first fingerprinting test to be produced.
+
+This fingerprinting test entry looks for a number of parameters within an ICMP 
+Echo reply sent in response to an ICMP Echo request probe the program produced.
+ 
+The test will look for several parameters within an ICMP echo reply sent in
+response to our ICMP echo query:
+
+	- The IP Header's Identification number (icmp_echo_ip_id) can be assigned 
+	  the following parameters: zero (0), another value (!0), or the same 
+	  value as the IP ID value in the ICMP Echo request the reply answering (SENT).
+	- The IP Header's type-of-service bits (icmp_echo_tos_bits), either 
+	  set to zero (0) or to another value (!0).
+	- The IP Header's Don't Fragment bit (icmp_echo_df_bit), either set (1)
+	  or not (0). 
+	- The IP Header's Time-To-Live field value (icmp_echo_reply_ttl).
+	  This value should be set to what was initialy the value used on the
+	  sending host. A little bit of guessing is needed, but it is more
+	  trivial than you might think. The usual default values are 16, 32, 64
+	  128 and 255. So if you receive with your reply the value of 114 as 
+	  the IP header's time-to-live value, it was probably set to 128 
+	  initialy.
+	- The ICMP code (icmp_echo_code), either set to zero (0), or to 
+	  another value (!0).
+ 
+
+	#Module A [ICMP ECHO Probe]
+	icmp_echo_code = [ 0, !0]
+	icmp_echo_ip_id = [ 0, !0 , SENT]
+	icmp_echo_tos_bits = [ 0, !0 ]
+	icmp_echo_df_bit = [0, 1]
+	icmp_echo_reply_ttl = [>< decimal num] 
+
+
+
+Modules B, C, D (Xprobe modules number 4,5,6)
+These modules are yes/no modules which test if we receive, or not, an ICMP
+timestamp reply, ICMP address mask reply, and ICMP information reply. The
+other parameter which is configurable is the IP time-to-live header field value
+received with the reply.
+
+March 20, 2003: A new parameter has been added which is checked with 
+each of the Yes/No tests - the IP ID value of the particular ICMP query
+reply. The optional values are: zero (0), another value other than zero (!0),
+or the same value as the IP ID value set in the ICMP Echo request the 
+reply is answering (SENT). 
+
+
+	#Module B [ICMP Timestamp request probe]
+	icmp_timestamp_reply = [y, n]
+	icmp_timestamp_reply_ttl = [>< decimal num]
+	icmp_timestamp_reply_ip_id = [ 0, !0, SENT]
+
+	#Module C [ICMP Address Mask request probe]
+	icmp_addrmask_reply = [ y, n]
+	icmp_addrmask_reply_ttl = [>< decimal num] 
+	icmp_addrmask_reply_ip_id = [ 0, !0 , SENT]
+
+	#Module D [ICMP Information request probe]
+	icmp_info_reply = [ y, n]
+	icmp_info_reply_ttl = [>< decimal num]
+	icmp_info_reply_ip_id = [ 0, !0, SENT]
+
+
+Even if the system you are fingerprinting do not answer for one of the tests, 
+you should make an effort to complete all entries available, if possible. 
+
+Although your system might not produce the particular reply out-of-the-box, it 
+might have a tunable kernel parameter, that if changed will cause the system 
+to answer the particular test. Therefore you should fill in the 
+icmp_xxx_reply_ttl with the appropriate value (it will be the same TTL as with 
+any ICMP query replies the system you are fingerprinting is producing) and the 
+icmp_xxx_reply_ip_id value.
+
+
+
+Module E (Xprobe modules number 7)
+Module E examines an ICMP Port Unreachable error message sent in response
+to a UDP datagram sent to a closed UDP port on the target machine.
+
+
+The first part of the entry deals with information from the IP Header of
+the ICMP Port Unreachable error message.
+
+	#Module E [UDP -> ICMP Unreachable probe]
+	#IP_Header_of_the_UDP_Port_Unreachable_error_message
+	icmp_unreach_echoed_dtsize = [8, 64, >64]
+
+	- The size of the echoed data from the offending packet.  
+	  This is the information past the echoed IP header...  
+	  Can be set to 8, 64 or more than 64 (>64)
+
+	
+	icmp_unreach_reply_ttl = [>< decimal num]
+
+	- The IP Header's Time-to-Live field value (see Module A for more 
+	  information).
+
+
+	icmp_unreach_precedence_bits = 0xc0, 0, (hex num)
+
+	- The IP Header's precedence bits value. Can be set to 0xc0 hex, 
+	  zero (0), or any other 'hex' value.
+
+
+	icmp_unreach_df_bit = [0 , 1 ]
+
+	- The IP Header's Don't Fragment Bit. Either set (1) or not (0).
+
+
+	icmp_unreach_ip_id = [ 0, !0, SENT]
+
+	- The IP Header's Identification number (icmp_echo_ip_id) can be 
+	  assigned the following parameters: zero (0), another value other 
+	  than zero (!0), or the same value as the IP ID value in the ICMP 
+	  Echo request the reply answering (SENT).
+
+
+The second part of the entry deals with informatation from the OFFENDING
+packet's original data ECHOED by the error message.
+
+	#Original_data_echoed_with_the_UDP_Port_Unreachable_error_message
+	icmp_unreach_echoed_udp_cksum = [0, OK, BAD]
+
+	- The echoed UDP checksum value. It might be set to zero (0), it might 
+	  be a mis-calculated value (BAD), or the appropriate value (OK).
+
+
+	icmp_unreach_echoed_ip_cksum  = [0, OK, BAD]
+
+	- The echoed IP Header's checksum. It might be set to zero (0), it 
+	  might be a be a mis-calculated value (BAD), or the appropriate 
+	  value (OK).
+
+
+	icmp_unreach_echoed_ip_id = [OK, FLIPPED]
+
+	- The IP Header's echoed Don't Fragment bit. It might be echoed fine 
+	  (OK), or in some cases its bits will be flipped (FLIPPED). 
+
+
+	icmp_unreach_echoed_total_len = [<20, OK, >20] 
+
+	- The IP Header's echoed total length field value. In some cases it 
+	  might not be echoed correctly - echoing a value less than 20 bytes 
+	  than the original value (<20), echoing a value higher with 20 bytes 
+	  than the original value (>20), or the accurate value (OK).
+ 
+
+	icmp_unreach_echoed_3bit_flags = [OK, FLIPPED]
+
+	- The IP Header's 3bit flags echoed value. This parameter can take the 
+	  value of either OK, when the 3bit flags were echeod correctly, or 
+	  FLIPPED when the 3bit flags and the fragmentation offset will make a 
+	  nice mess...
+
+
+Module F (Xprobe modules number 8)
+Examines a SYN | ACK response received from an open TCP ports on the target 
+machine as a reply to a SYN request sent by Xprobe2.
+
+	#Module F [TCP SYN | ACK Module]
+	#IP header of the TCP SYN ACK
+	tcp_syn_ack_tos = [0, <value>]
+
+	- The value of the received TOS field. Can be set to any hex value using 
+	  0x<value>, or to a numerical value.
+
+
+	tcp_syn_ack_df = [0 , 1 ]
+
+	- The IP Header's Don't Fragment Bit. Either set (1) or not (0).
+
+
+	tcp_syn_ack_ip_id = [0 , !0, SENT ]
+
+	- The IP header's IP ID value of the received SYN | ACK. Can be set to 
+	  0, a value other than zero (!0), and if the IP ID value of the 
+	  received SYN | ACK is the same as of the SYN sent, to SENT.
+
+
+	tcp_syn_ack_ttl = [>< decimal num]
+
+
+	- The IP Header's Time-to-Live field value (see Module A for more 
+	  information).
+
+
+	#Information from the TCP header
+	tcp_syn_ack_ack = [<value>]
+
+	- The values of the received ACK minus the value of the sent SYN. Usually
+	  will be 1. Can be set to any numerical value
+
+	tcp_syn_ack_window_size = [<value>]
+
+	- The initial window size with the SYN | ACK. 
+
+
+	tcp_syn_ack_options_order = ["order"]
+
+	- The OPTIONS order received with the SYN ACK. Represented by the following 
+	  keywords - NOP, TIMESTAMP, WSCALE, MSS. A space should be used between 
+	  keywords
+
+
+	tcp_syn_ack_wscale = [<value>, NONE]
+
+	- The numerical value of the WSCALE option, if presented. If not presented
+	  use NONE.
+
+
+Contributing your signatures
+============================
+
+Send us your new fingerprints to ofir@sys-security.com.
+
+
+More Information
+================
+For more information please see:
+http://www.sys-security.com/html/papers.html
+

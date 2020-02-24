@@ -1,0 +1,28 @@
+
+Successive client-choosen ISNs upon telnet connect:
+
+1474526322
+1522383322
+1542328371
+1561575407
+1588181513
+...
+
+then, connect to client-machine, now server ISN:
+
+1743032657
+1772878939
+1784206170
+
+
+swicth back as client:
+
+1803144879
+1843311757
+1879976257
+
+
+and server again:
+
+1897176627
+

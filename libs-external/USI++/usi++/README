@@ -1,0 +1,52 @@
+Purposes of the header-files
+----------------------------
+
+    o	<classname>.h	(arp.h etc.)	
+
+         must be included by all programs that use <classname>
+	 except they include usi++.h (which is old style)
+	 It doesn't open the namespace usipp.
+
+    o  usi++.h
+	
+	 this file contains all definitions which are needed
+	 by programs using USI++. It is just for compatibility
+	 purposes.
+	 Opens namespace usipp.
+	 
+    o usi++
+    
+	 Makes the global functions visible: error-handling, checksum etc.
+	 Users should do
+	 
+	 #include <usi++/usi++>
+	 #include <usi++/arp.h>		// or whatever
+	 using namespace usipp;
+	 
+	 to get the power of USI++ :)
+	 
+    o usi-structs.h
+    
+	For USI++ internal use. All cc-files from this lib include
+	usi-structs.h because they'll find ip-struct etc. there.
+	If you need a reliable declaration of such structs, you can also
+	use usi-strcuts.h (coz on many OS' these strcuts are broken).
+	After including usi-strcuts.h you almost don't need to include
+	any other net-header as sys/socket.h or such.
+	It's all putten into usipp-namespace which is not opened by
+	usi-structs.h
+
+	
+All C++-files in the USI++ library should include the files needed in
+the following order:
+
+
+"config.h"		if necessary	
+"usi-structs.h"		which gives all needed protocol-headers
+		        and types (also includes sys/types.h)
+"<class>.h"		(datalink.h) to get the inherited-from types
+
+<...>			other stuff needed, i.e. <string.h> etc.
+
+    
+			    
