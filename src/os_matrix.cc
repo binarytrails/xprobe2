@@ -42,12 +42,12 @@ OS_Name::OS_Name(void) {
  *******************
  * returns FAIL is the OS already exist. os_id otherwise.
  */
- 
+
 
 int OS_Name::add_os(string &os_name) {
 
     if (find_os(os_name) != FAIL) return FAIL; /* exist */
-    
+
     osid_name.insert(pair<int, string>(id_count, os_name));
     return (id_count++);
 }
@@ -58,7 +58,7 @@ int OS_Name::add_os(string &os_name) {
  *******************
  * returns FAIL is the OS does not exist. os_id otherwise.
  */
- 
+
 
 int OS_Name::find_os(string &os_name) {
     map <int, string>::iterator osid_i;
@@ -76,7 +76,7 @@ int OS_Name::find_os(string &os_name) {
  *******************
  * for debugging _ONLY_
  */
- 
+
 
 void OS_Name::list_oses(void) {
     map <int, string>::iterator osid_i;
@@ -94,18 +94,18 @@ void OS_Name::list_oses(void) {
  *******************
  * for debugging _ONLY_
  */
- 
 
 
-const string OS_Name::osid2str(int id) {
+
+const string & OS_Name::osid2str(int id) {
     map <int, string>::iterator osid_i = osid_name.find(id);
     if (osid_i != osid_name.end()) return ((*osid_i).second);
     return ("BUG, PLEASE REPORT! :-)");
 }
-    
+
 /*
  * OS_Vector stuff:
- */        
+ */
 OS_Vector::OS_Vector(int new_os_id) {
     os_id = new_os_id;
     total = 0;
@@ -148,18 +148,18 @@ int OS_Matrix::find_os_id(int os_id) {
         if (os_id == osid_vec[i].get_os_id()) return i;
     return -1;
 }
-        
+
 void OS_Matrix::add_result(int test_id, int os_id, int score, int times) {
     int i;
 
-    xprobe_debug(XPROBE_DEBUG_OSMATRIX, "test_id: %i os_id: %i score: %i\n", test_id, os_id, score); 
+    xprobe_debug(XPROBE_DEBUG_OSMATRIX, "test_id: %i os_id: %i score: %i\n", test_id, os_id, score);
 
     if (find_os_id(os_id) == -1) /* if doesn't exist. we insert it
                                       * first */
         osid_vec.push_back(OS_Vector(os_id));
 
     i = find_os_id(os_id);
-	while (times-- > 0) {			
+	while (times-- > 0) {
 	    osid_vec[i].add_result(test_id, score);
 	}
 }
@@ -173,7 +173,7 @@ int OS_Matrix::get_score(int os_id) {
 
 int OS_Matrix::get_max_score(int os_id) {
 	int i = find_os_id(os_id);
-	
+
     //return (xp_loaded_mods * XPROBE_MATCH_YES);
 	return (osid_vec[i].get_number_of_keywords() * XPROBE_MATCH_YES);
 
@@ -181,12 +181,12 @@ int OS_Matrix::get_max_score(int os_id) {
 
 int OS_Matrix::get_prcnt_score(int os_id) {
 
-    if (get_score(os_id) < 0) return 0;	
+    if (get_score(os_id) < 0) return 0;
     return get_score(os_id) * 100/get_max_score(os_id);
 
 }
 
-int OS_Matrix::get_top(int num) { 
+int OS_Matrix::get_top(int num) {
 
     sort(osid_vec.begin(), osid_vec.end(), os_vector_compare);
 
@@ -194,5 +194,4 @@ int OS_Matrix::get_top(int num) {
         return osid_vec[num].get_os_id();
 
     return 0; /* out of range */
-} 
-
+}

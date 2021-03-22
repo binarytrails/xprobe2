@@ -44,9 +44,9 @@ class OS_Name {
         int id_count;
     public:
         OS_Name(void);
-        const string osid2str(int);
+        const string & osid2str(int);
         const char *osid2char(int id) {
-             string s = osid2str(id);
+             const string & s = osid2str(id);
              return (s.c_str());
         }
         int add_os(string &os_name);
@@ -54,7 +54,7 @@ class OS_Name {
         void list_oses(void);
         int get_osnum(void) { return id_count; }
 };
-               
+
 
 class OS_Vector {
 
@@ -79,7 +79,7 @@ class OS_Matrix {
         vector <OS_Vector> osid_vec;
         int xp_loaded_mods;
         int find_os_id(int);
-    
+
     public:
         OS_Matrix(int);
         virtual ~OS_Matrix(void);
@@ -96,4 +96,3 @@ class OS_Matrix {
 };
 
 #endif /* INTERFACE_H */
-            
